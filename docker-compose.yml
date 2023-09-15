@@ -1,0 +1,63 @@
+version: "3.9"
+services:
+    ## --------------------------------------------------
+    ## | Backend - webserver service
+    ## --------------------------------------------------
+    check24_webserver:
+        image: nginx:1.23.1
+        container_name: check24_webserver
+        restart: unless-stopped
+        ports:
+            - "8088:80"
+        volumes:
+            - ./:/var/www
+            - ./.docker/check24_webserver/conf.d:/etc/nginx/conf.d
+        depends_on:
+            - check24_backend
+        networks:
+            - check24-network
+    
+    ## --------------------------------------------------
+    ## | Backend - Php service
+    ## --------------------------------------------------
+    check24_backend:
+        build:
+            args:
+                user: check24-user
+                uid: 1000
+            context: .
+            dockerfile: .docker/check24_backend/Dockerfile
+        container_name: check24_backend
+        restart: unless-stopped
+        tty: true
+        volumes:
+            - ./:/var/www
+            - ./.docker/check24_backend/config/php.ini:/usr/local/etc/php/php.ini
+        networks:
+            - check24-network
+    ## --------------------------------------------------
+    ## | Mysql - Database service
+    ## --------------------------------------------------
+    check24_mysql:
+        container_name: check24-mysql
+        hostname: check24-mysql
+        build:
+            context: .docker/check24_mysql
+            dockerfile: Dockerfile
+        environment:
+            MYSQL_DATABASE: checkDb
+            MYSQL_USER: checkUser
+            MYSQL_PASSWORD: checkPass
+            MYSQL_ROOT_PASSWORD: checkRootPass
+        ports:
+            - "3308:3306"
+        volumes:
+            - .docker/check24_mysql/data:/var/lib/mysql
+        restart: always
+        networks:
+            check24-network:
+
+networks:
+    check24-network:
+        driver: bridge
+
