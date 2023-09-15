@@ -3,61 +3,61 @@ services:
     ## --------------------------------------------------
     ## | Backend - webserver service
     ## --------------------------------------------------
-    check24_webserver:
+    sarveno_webserver:
         image: nginx:1.23.1
-        container_name: check24_webserver
+        container_name: sarveno_webserver
         restart: unless-stopped
         ports:
             - "8088:80"
         volumes:
             - ./:/var/www
-            - ./.docker/check24_webserver/conf.d:/etc/nginx/conf.d
+            - ./.docker/sarveno_webserver/conf.d:/etc/nginx/conf.d
         depends_on:
-            - check24_backend
+            - sarveno_backend
         networks:
-            - check24-network
+            - sarveno-network
     
     ## --------------------------------------------------
     ## | Backend - Php service
     ## --------------------------------------------------
-    check24_backend:
+    sarveno_backend:
         build:
             args:
-                user: check24-user
+                user: sarveno-user
                 uid: 1000
             context: .
-            dockerfile: .docker/check24_backend/Dockerfile
-        container_name: check24_backend
+            dockerfile: .docker/sarveno_backend/Dockerfile
+        container_name: sarveno_backend
         restart: unless-stopped
         tty: true
         volumes:
             - ./:/var/www
-            - ./.docker/check24_backend/config/php.ini:/usr/local/etc/php/php.ini
+            - ./.docker/sarveno_backend/config/php.ini:/usr/local/etc/php/php.ini
         networks:
-            - check24-network
+            - sarveno-network
     ## --------------------------------------------------
     ## | Mysql - Database service
     ## --------------------------------------------------
-    check24_mysql:
-        container_name: check24-mysql
-        hostname: check24-mysql
+    sarveno_mysql:
+        container_name: sarveno-mysql
+        hostname: sarveno-mysql
         build:
-            context: .docker/check24_mysql
+            context: .docker/sarveno_mysql
             dockerfile: Dockerfile
         environment:
-            MYSQL_DATABASE: checkDb
-            MYSQL_USER: checkUser
-            MYSQL_PASSWORD: checkPass
-            MYSQL_ROOT_PASSWORD: checkRootPass
+            MYSQL_DATABASE: sarVenoDb
+            MYSQL_USER: sarVenoUser
+            MYSQL_PASSWORD: sarVenoPass
+            MYSQL_ROOT_PASSWORD: sarVenoRootPass
         ports:
             - "3308:3306"
         volumes:
-            - .docker/check24_mysql/data:/var/lib/mysql
+            - .docker/sarveno_mysql/data:/var/lib/mysql
         restart: always
         networks:
-            check24-network:
+            sarveno-network:
 
 networks:
-    check24-network:
+    sarveno-network:
         driver: bridge
 
