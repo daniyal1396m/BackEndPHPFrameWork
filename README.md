@@ -15,3 +15,7 @@ ________________
 3- use web:
 
     http://localhost:8088
+
+4- use phpmyadmin:
+
+    http://localhost:8090

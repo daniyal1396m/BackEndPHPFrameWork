@@ -80,4 +80,24 @@ class QueryBuilder
         $stmt->bindParam(':id', $id);
         $stmt->execute();
     }
+
+    public function done(string $table, $id = 0)
+    {
+        $check_isDone = $this->first($table, null, $id);
+        $json = json_encode($check_isDone[0]);
+        $dataArray = json_decode($json, true);
+        $isDoneValue = ($dataArray['isDone'] == 0) ? 1 : 0;
+        $stmt = $this->db->prepare("UPDATE {$table} SET isDone = :isDone WHERE id = :id");
+        $stmt->bindParam(':isDone', $isDoneValue, PDO::PARAM_BOOL);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    public function latest(string $table)
+    {
+
+        $stmt = $this->db->prepare("SELECT * FROM {$table} ORDER BY id DESC LIMIT 1");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 }

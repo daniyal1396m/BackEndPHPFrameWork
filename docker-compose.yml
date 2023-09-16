@@ -16,8 +16,22 @@ services:
             - sarveno_backend
         networks:
             - sarveno-network
-    
-    ## --------------------------------------------------
+
+#    sarveno_apache:
+#        image: httpd:2.4
+#        container_name: sarveno_apache
+#        restart: unless-stopped
+#        ports:
+#            - "8088:80"
+#        volumes:
+#            - ./:/usr/local/apache2/htdocs
+#        depends_on:
+#            - sarveno_backend
+#        networks:
+#            - sarveno-network
+
+
+        ## --------------------------------------------------
     ## | Backend - Php service
     ## --------------------------------------------------
     sarveno_backend:
@@ -35,6 +49,20 @@ services:
             - ./.docker/sarveno_backend/config/php.ini:/usr/local/etc/php/php.ini
         networks:
             - sarveno-network
+    # Add this section for phpMyAdmin
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:5.1
+        container_name: sarveno_phpmyadmin
+        restart: unless-stopped
+        ports:
+            - "8090:80"
+        environment:
+            PMA_HOST: sarveno_mysql  # Use the MySQL container name
+            PMA_USER: sarVenoUser    # MySQL username
+            PMA_PASSWORD: sarVenoPass  # MySQL password
+        networks:
+            - sarveno-network
+
     ## --------------------------------------------------
     ## | Mysql - Database service
     ## --------------------------------------------------
@@ -55,7 +83,7 @@ services:
             - .docker/sarveno_mysql/data:/var/lib/mysql
         restart: always
         networks:
-            sarveno-network:
+            - sarveno-network
 
 networks:
     sarveno-network:

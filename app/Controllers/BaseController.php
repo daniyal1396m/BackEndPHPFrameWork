@@ -20,59 +20,49 @@ class BaseController
     public function storeTasks()
     {
         $params = [
-            'title' => (empty($_POST['title'])) ? '' : trim(strip_tags($_POST['title'])),
+            'title' => $_POST['start'],
             'isDone' => 0,
-            'created_at' => now()->format('Y-m-d H:i:s'),
+            'created_at' => date('Y-m-d H:i:s', time()),
         ];
-
-        if (empty($params['title'])) {
-            return false;
+        if ($_POST['start'] == '') {
+            echo json_encode(0);
         }
-        if (App::get('DB')->insert('tasks', $params)) {
-            return true;
-        } else {
-            return false;
-        }
+        App::get('DB')->insert('tasks', $params);
+        $latest = json_encode(App::get('DB')->latest('tasks'));
+        echo json_decode($latest, true)[0]['id'];
     }
 
-    public function updateTasks(): bool
+    public function updateTasks()
     {
         $params = [
             'title' => (empty($_POST['title'])) ? '' : trim(strip_tags($_POST['title'])),
         ];
         if (empty($params['title'])) {
-            return false;
+            echo json_encode(0);
+            exit(0);
         }
-        if (App::get('DB')->update('tasks', $params, $_POST['id'])) {
-            return true;
-        } else {
-            return false;
-        }
+        return App::get('DB')->update('tasks', $params, $_POST['id']);
     }
 
-    public function doneTasks(): bool
+    public function doneTasks()
     {
-        $params = [
-            'status' => 1
-        ];
-        if (App::get('DB')->update('tasks', $params, $_POST['id'])) {
-            return true;
-        } else {
-            return false;
-        }
+       return App::get('DB')->done('tasks', $_POST['id']);
     }
 
     public function deleteTasks()
     {
         if ($_POST['id'] == null) {
-            return false;
+            echo json_encode(0);
+            exit(0);
         }
         $id = trim(strip_tags($_POST['id']));
         $task = App::get('DB')->first('tasks', id: $id);
         if (!empty($task)) {
             App::get('DB')->delete('tasks', $id);
-            return true;
+            echo json_encode(1);
+            exit(0);
         }
-        return false;
+        echo json_encode(0);
+        exit(0);
     }
 }
