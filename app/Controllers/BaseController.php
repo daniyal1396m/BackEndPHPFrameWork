@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use Core\App;
+use Core\Request;
 
 class BaseController
 {
@@ -19,13 +20,14 @@ class BaseController
 
     public function storeTasks()
     {
+        $value = Request::post('start');
         $params = [
-            'title' => $_POST['start'],
+            'title' => $value,
             'isDone' => 0,
             'created_at' => date('Y-m-d H:i:s', time()),
         ];
-        if ($_POST['start'] == '') {
-            echo json_encode(0);
+        if ($value == '') {
+            echo noContentResponse();
         }
         App::get('DB')->insert('tasks', $params);
         $latest = json_encode(App::get('DB')->latest('tasks'));
@@ -34,35 +36,35 @@ class BaseController
 
     public function updateTasks()
     {
+        $value = Request::post('title');
+
         $params = [
-            'title' => (empty($_POST['title'])) ? '' : trim(strip_tags($_POST['title'])),
+            'title' => (empty($value)) ? '' : trim(strip_tags($value)),
         ];
-        if (empty($params['title'])) {
-            echo json_encode(0);
-            exit(0);
+        if (empty($value)) {
+            echo noContentResponse();
         }
-        return App::get('DB')->update('tasks', $params, $_POST['id']);
+        return App::get('DB')->update('tasks', $params, Request::post('id'));
     }
 
     public function doneTasks()
     {
-       return App::get('DB')->done('tasks', $_POST['id']);
+       return App::get('DB')->done('tasks', Request::post('id'));
     }
 
     public function deleteTasks()
     {
-        if ($_POST['id'] == null) {
-            echo json_encode(0);
-            exit(0);
+        $value =Request::post('id');
+        if ($value == null) {
+            echo noContentResponse();
         }
-        $id = trim(strip_tags($_POST['id']));
+        $id = trim(strip_tags($value));
         $task = App::get('DB')->first('tasks', id: $id);
         if (!empty($task)) {
             App::get('DB')->delete('tasks', $id);
             echo json_encode(1);
             exit(0);
         }
-        echo json_encode(0);
-        exit(0);
+        echo noContentResponse();
     }
 }
