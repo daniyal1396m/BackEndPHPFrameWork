@@ -3,7 +3,8 @@
 
 ## Installation Just Run Codes And Use With React 
 ## [From Link](https://github.com/daniyal1396m/FrontEndREACTJSToDo/tree/master)
-## BeFore Run This Script Make Sure You Did Installed Docker And Php And Composer and zip extention is Enabled  In Your System.    
+## BeFore Run This Script Make Sure You Did Installed Docker And Php And Composer and zip extention is Enabled  In Your System.
+## the ddl is in .docker/sarveno_mysql/init-entrypoint/tasks_data.sql
 ________________
 
 1- run docker compose file:
