@@ -3,7 +3,7 @@
 
 ## Installation Just Run Codes And Use With React 
 ## [From Link](https://github.com/daniyal1396m/FrontEndREACTJSToDo/tree/master)
-    
+## BeFore Run This Script Make Sure You Did Installed Docker And Php And Composer and zip extention is Enabled  In Your System.    
 ________________
 
 1- run docker compose file:
