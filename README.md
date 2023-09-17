@@ -1,4 +1,4 @@
-#TODO:
+#TODO For Use This Backend Custom FrameWork:
 
 
 ## installation
@@ -19,3 +19,10 @@ ________________
 4- use phpmyadmin:
 
     http://localhost:8090
+
+5- Db : 
+    
+      MYSQL_DATABASE: sarVenoDb
+      MYSQL_USER: sarVenoUser
+      MYSQL_PASSWORD: sarVenoPass
+      MYSQL_ROOT_PASSWORD: sarVenoRootPass
