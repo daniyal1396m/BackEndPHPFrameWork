@@ -95,9 +95,24 @@ class QueryBuilder
 
     public function latest(string $table)
     {
-
         $stmt = $this->db->prepare("SELECT * FROM {$table} ORDER BY id DESC LIMIT 1");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    public function exists(string $table , string $email)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$table} WHERE email = :email");
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
+    public function findUser(string $table , string $email)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$table} WHERE email = :email");
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
     }
 }

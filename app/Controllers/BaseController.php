@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use Core\App;
 use Core\Request;
+use Firebase\JWT\JWT;
 
 class BaseController
 {
@@ -20,7 +21,7 @@ class BaseController
 
     public function storeTasks()
     {
-        $value = Request::post('start');
+        $value = Request::post('title');
         $params = [
             'title' => $value,
             'isDone' => 0,
@@ -67,4 +68,90 @@ class BaseController
         }
         echo noContentResponse();
     }
+
+    /*
+     *
+     * Authentication
+     *
+     * */
+    public function register()
+    {
+        $name = Request::post('name');
+        $email = Request::post('email');
+        $password = password_hash(Request::post('password'),
+            PASSWORD_DEFAULT);
+        $params = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password
+        ];
+        if ($name == '' || $email == '' || $password == '') {
+            echo noContentResponse();
+        }
+        if (APP::get('DB')->exists('users', $email)) {
+            echo noContentResponse();
+        } else {
+            App::get('DB')->insert('users', $params);
+        }
+    }
+
+    public function login()
+    {
+        $email = Request::post('email');
+        $password = Request::post('password');
+        $params = [
+            'email' => $email,
+            'password' => $password
+        ];
+        if ($params['email'] == '' || $params['password'] == '') {
+            echo noContentResponse();
+        }
+        if (APP::get('DB')->exists('users', $email)) {
+            $user = APP::get('DB')->findUser('users', $params['email']);
+            if (password_verify($params['password'], $user[0]->password)) {
+                session_start();
+                $uniqueCode = bin2hex(random_bytes(16));
+                $secret_key = $uniqueCode;
+                $issuer_claim = "http://localhost:8088";
+                $audience_claim = "http://localhost:3000";
+                $issuedat_claim = time();
+                $notbefore_claim = $issuedat_claim + 10;
+                $expire_claim = $issuedat_claim + 60;
+                $token = array(
+                    "iss" => $issuer_claim,
+                    "aud" => $audience_claim,
+                    "iat" => $issuedat_claim,
+                    "nbf" => $notbefore_claim,
+                    "exp" => $expire_claim,
+                    "data" => array(
+                        "name" => $user[0]->password,
+                        "email" => $user[0]->email
+                    ));
+                http_response_code(200);
+                $jwt = JWT::encode($token, $secret_key, 'HS256');
+                echo json_encode(
+                    array(
+                        "status" => 200,
+                        "message" => "Successful login.",
+                        "jwt" => $jwt,
+                        "uniqueCode" => $secret_key,
+                        "email" => $email,
+                        "expireAt" => $expire_claim
+                    ));
+            } else {
+                echo json_encode(
+                    array(
+                        "status" => 404,
+                        "message" => "login Error",
+                    ));
+            }
+        } else {
+            echo noContentResponse();
+        }
+    }
+    /*
+     *
+     * End Authentication
+     *
+     * */
 }
